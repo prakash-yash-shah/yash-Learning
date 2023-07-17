@@ -1,0 +1,198 @@
+﻿@model IEnumerable<WebApplication.Models.EmployeeModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<br />
+<!--Modal Popup Start-->
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Your Information</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="ID">
+
+                    <div class="form-group">
+                        <label>Employee Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="Enter your Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Employee Email</label>
+                        <input type="text" class="form-control" id="email" placeholder="Enter your Email">
+                    </div>
+                    <div class="form-group">
+                        <label>Employee City</label>
+                        <input type="text" class="form-control" id="city" placeholder="Enter your City">
+                    </div>
+                    <div class="form-group">
+                        <label> Gender : </label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="Male" name="gender" id="Male">
+                            <label class="form-check-label" for="flexRadioDefault1">
+                                Male
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" value="Female" name="gender" id="Female">
+                            <label class="form-check-label" for="flexRadioDefault2">
+                                Female
+                            </label>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" onclick="btnSave()" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--Modal Popup End-->
+<p>
+    <a href="/Home/Create" class="btn btn-success">Register Here</a>
+    @*@Html.ActionLink("Create New", "Create")*@
+</p>
+<table class="table table-striped">
+    <tr>
+        <th>
+            Employee Name
+        </th>
+        <th>
+            Employee Email
+        </th>
+        <th>
+            Employee City
+        </th>
+        <th>
+            Employee Gender
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @item.EmpName
+            </td>
+            <td>
+                @item.EmpEmail
+            </td>
+            <td>
+                @item.EmpCity
+            </td>
+            @if (item.EmpGender == true)
+            {
+                <td>Male</td>
+            }
+            else
+            {
+                <td>Female</td>
+            }
+            <td>
+                <a class="btn btn-primary" onclick="btnedit(@item.EmpId)" data-toggle="modal" data-target="#myModal">Edit</a> |
+                <a class="btn btn-danger" onclick="btnDelete(@item.EmpId)">Delete</a>
+            </td>
+        </tr>
+    }
+
+</table>
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script>
+    function btnDelete(id) {
+        var a = confirm("Are you sure want to delete");
+        if (a == true) {
+            debugger;
+            $.ajax({
+                type: "POST",
+                url: "/Home/Delete",
+                data:
+                {
+                    "EmpId": id
+                },
+                success: function (result) {
+                    alert("Successfully-Deleted");
+                    window.location.reload();
+                },
+                error: function (result) {
+                    alert("Failed While Deleting Data");
+                }
+            })
+        }
+        else {
+
+        }
+    }
+
+    function btnedit(id) {
+        $.get("/Home/Edit", { Id: id },
+            function (data) {
+                console.log("data");
+                console.log(data);
+                if (data != null) {
+                    $("#ID").val(data[0].EmpId);
+                    $("#name").val(data[0].EmpName);
+                    $("#email").val(data[0].EmpEmail);
+                    $("#city").val(data[0].EmpCity);
+                    if (data[0].EmpGender == true) {
+                        $('input:radio[id=Male]').attr('checked', true);
+                        $('input:radio[id=Female]').attr('checked', false);
+                    }
+                    if (data[0].EmpGender == false) {
+                        $('input:radio[id=Female]').attr('checked', true);
+                        $('input:radio[id=Male]').attr('checked', false);
+                    }
+                }
+            }
+        )
+    }
+
+    function btnSave() {
+        var gender = null;
+        var id = $("#ID").val();
+        var name = $("#name").val();
+        var email = $("#email").val();
+        var city = $("#city").val();
+        var radioValue = $("input[name='gender']:checked").val();
+        if (radioValue == "Male") {
+            gender = true;
+        }
+        else {
+            gender = false;
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Home/Edit",
+            data: {
+                EmpName: name,
+                EmpId: id,
+                EmpCity: city,
+                EmpEmail: email,
+                EmpGender: gender
+            },
+            success: function (msg) {
+                //sweetalert("Changes Saved");
+                alert(msg);
+                $("#myModal").attr("data-dismiss", "modal");
+                window.location.reload();
+            },
+            error: function (data) {
+                //sweetalert("Error While Updating Data");
+                alert("Error While Updating Data");
+            }
+        })
+    }
+</script>

@@ -1,0 +1,73 @@
+﻿@model WebApplication.Models.EmployeeModel
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Register Here</h2>
+<form>
+    <div class="form-group">
+        <label>Employee Name</label>
+        <input type="text" class="form-control" id="name" autocomplete="off" placeholder="Enter your Name">
+    </div>
+    <div class="form-group">
+        <label>Employee Email</label>
+        <input type="text" class="form-control" id="email" autocomplete="off" placeholder="Enter your Email">
+    </div>
+    <div class="form-group">
+        <label>Employee City</label>
+        <input type="text" class="form-control" id="city" autocomplete="off" placeholder="Enter your City">
+    </div>
+    <div class="form-group">
+        <label> Gender : </label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" id="Male">
+            <label class="form-check-label" for="flexRadioDefault1">
+                Male
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="Female">
+            <label class="form-check-label" for="flexRadioDefault2">
+                Female
+            </label>
+        </div>
+    </div>
+    <button type="submit" onclick="btnsubmit()" class="btn btn-primary">Submit</button>
+</form>
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script>
+    
+    function btnsubmit() {
+                var gender = null;
+                var Name = $("#name").val();
+                var Email = $("#email").val();
+                var City = $("#city").val();
+                var radioValue = $("input[name='gender']:checked").val();
+                if (radioValue == "on") {
+                    gender = true;
+                }
+                else {
+                    gender = false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/Create",
+                    data: {
+                        EmpName: Name,
+                        EmpEmail: Email,
+                        EmpCity: City,
+                        EmpGender: gender
+                    },
+                    success: function (result) {
+                        debugger;
+                        window.location.href = "/Home/Index";
+                    },
+                    error: function (jsonmsg) {
+                        alert("Error Occured");
+                    }
+                })
+            }
+
+
+</script>
